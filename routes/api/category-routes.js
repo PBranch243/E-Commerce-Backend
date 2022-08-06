@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
     // be sure to include its associated Products
     include: [{
       model: Product,
-      attributes: ['product_name']
+      attributes: ['product_name', 'price', 'stock']
     }]
     
   }).then(dbData => res.json(dbData))
@@ -22,7 +22,27 @@ router.get('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
   // find one category by its `id` value
-  // be sure to include its associated Products
+  Category.findOne({
+    where: {
+      id: req.params.id
+    },
+    // be sure to include its associated Products
+    include: [{
+      model: Product,
+      attributes: ['product_name', 'price', 'stock']
+    }]
+  })
+    .then(dbData => {
+      if (!dbData){
+        res.status(404).json({message: 'No category with that id'});
+        return;
+      }
+      res.json(dbData)
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
 });
 
 router.post('/', (req, res) => {
